@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+
 
 interface LeadRecord {
   email: string;
@@ -14,17 +13,12 @@ interface LeadRecord {
   source?: string;
 }
 
+// In-memory lead store (use an ESP/CRM for persistence in production)
+const leads: LeadRecord[] = [];
+
 async function appendToLocalStore(record: LeadRecord): Promise<void> {
-  const filePath = path.join(process.cwd(), 'data', 'leads.json');
-  let list: LeadRecord[] = [];
-  try {
-    const raw = await fs.readFile(filePath, 'utf-8');
-    list = JSON.parse(raw);
-  } catch {
-    // file doesn't exist yet
-  }
-  list.push(record);
-  await fs.writeFile(filePath, JSON.stringify(list, null, 2), 'utf-8');
+  leads.push(record);
+  console.log('[capture] lead stored in memory:', record.email);
 }
 
 async function pushToMailchimp(record: LeadRecord): Promise<void> {
@@ -127,21 +121,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-// Admin: GET /api/capture returns the local leads JSON (protect this in production with auth)
 export async function GET() {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  try {
-    const filePath = path.join(process.cwd(), 'data', 'leads.json');
-    const raw = await fs.readFile(filePath, 'utf-8');
-    return new NextResponse(raw, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Disposition': 'attachment; filename="insignia-leads.json"',
-      },
-    });
-  } catch {
-    return NextResponse.json([]);
-  }
+  return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 }

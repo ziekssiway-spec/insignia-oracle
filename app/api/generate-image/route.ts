@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     req.headers.get('x-real-ip') ||
     'unknown';
 
-  const limit = await checkRateLimit(ip);
+  const limit = checkRateLimit(ip);
 
   if (!limit.allowed) {
     const resetsIn = Math.ceil((limit.resetsAt - Date.now()) / 1000 / 60 / 60);
