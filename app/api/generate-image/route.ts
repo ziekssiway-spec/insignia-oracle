@@ -42,13 +42,15 @@ export async function POST(req: NextRequest) {
         quality: 'high',
       });
 
-      const item = response.data[0];
+      const data = response.data ?? [];
+      const item = data[0];
       if (!item) throw new Error('No image returned');
 
       // gpt-image-1 returns base64, dall-e-3 returns a URL
+      const b64 = (item as { b64_json?: string }).b64_json;
       const imageUrl = item.url
         ? item.url
-        : `data:image/png;base64,${(item as { b64_json?: string }).b64_json}`;
+        : `data:image/png;base64,${b64}`;
 
       return NextResponse.json({ imageUrl });
     } catch (err: unknown) {
