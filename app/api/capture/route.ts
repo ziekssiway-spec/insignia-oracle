@@ -79,6 +79,27 @@ async function pushToKlaviyo(record: LeadRecord): Promise<void> {
   });
 }
 
+async function pushToKit(record: LeadRecord): Promise<void> {
+  const apiKey = process.env.KIT_API_KEY!;
+  const formId = process.env.KIT_FORM_ID!;
+
+  await fetch(`https://api.convertkit.com/v3/forms/${formId}/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      api_key: apiKey,
+      email: record.email,
+      first_name: record.name,
+      fields: {
+        family_name: record.family,
+        spirit_animal: record.animal,
+        matched_quote: record.quote,
+        crest_image_url: record.imageUrl,
+      },
+    }),
+  });
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { email, answers, quote, imageUrl, source } = body;
@@ -108,13 +129,14 @@ export async function POST(req: NextRequest) {
 
   // Push to ESP if configured
   try {
-    if (process.env.MAILCHIMP_API_KEY && process.env.MAILCHIMP_LIST_ID) {
+    if (process.env.KIT_API_KEY && process.env.KIT_FORM_ID) {
+      await pushToKit(record);
+    } else if (process.env.MAILCHIMP_API_KEY && process.env.MAILCHIMP_LIST_ID) {
       await pushToMailchimp(record);
     } else if (process.env.KLAVIYO_API_KEY) {
       await pushToKlaviyo(record);
     }
   } catch (err) {
-    // Non-fatal: lead is already in local store
     console.error('[capture] ESP push failed:', err);
   }
 
