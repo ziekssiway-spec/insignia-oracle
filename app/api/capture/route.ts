@@ -90,12 +90,6 @@ async function pushToKit(record: LeadRecord): Promise<void> {
       api_key: apiKey,
       email: record.email,
       first_name: record.name,
-      fields: {
-        family_name: record.family,
-        spirit_animal: record.animal,
-        matched_quote: record.quote,
-        crest_image_url: record.imageUrl,
-      },
     }),
   });
 }
