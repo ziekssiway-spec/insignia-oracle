@@ -19,6 +19,7 @@ export interface Answers {
   protection?: string;
   futureself?: string;
   mantra?: string;
+  includeInitial?: 'yes' | 'no';
 }
 
 export type Screen = 'welcome' | 'questionnaire' | 'gate' | 'result';

@@ -28,7 +28,7 @@ export function buildPrompt(answers: Answers): string {
     : '';
   const plantPart = answers.plant ? `, framed by ${firstClause(answers.plant)}` : '';
   const elementPart = answers.element ? `, surrounded by ${ELEMENT_MOTIF[answers.element]}` : '';
-  const initial = familyInitial(answers);
+  const initial = answers.includeInitial === 'no' ? '' : familyInitial(answers);
   const monogramPart = initial ? `, and the serif initial "${initial}" engraved beneath` : '';
 
   const crest = `a heraldic ${animal} carved at the centre${plantPart}${elementPart}${symbolPart}${monogramPart}`;

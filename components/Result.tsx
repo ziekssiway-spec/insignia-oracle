@@ -48,7 +48,8 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const [loaderMsg, setLoaderMsg] = useState(LOADER_MESSAGES[0]);
   const [promptOpen, setPromptOpen] = useState(false);
   const [currentPrompt, setCurrentPrompt] = useState('');
@@ -133,14 +134,17 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
     }).catch(() => {});
   }, [email, answers, quote]);
 
-  // Generate image on mount
+  // Cleanup on unmount
   useEffect(() => {
-    generate();
     return () => {
       if (loaderTimer.current) clearInterval(loaderTimer.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleForge = useCallback(() => {
+    setHasStarted(true);
+    generate();
+  }, [generate]);
 
   const handleImageLoad = () => {
     if (loaderTimer.current) clearInterval(loaderTimer.current);
@@ -202,22 +206,35 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
     <div className="stage result-stage">
       {/* Ring image */}
       <div className="ring-frame">
-        <div className={`ring-loader${!isGenerating && imageLoaded ? ' done' : ''}`}>
-          <div className="loader-ornament" />
-          <div className="loader-title">Forging your signet…</div>
-          <div className="loader-sub">Etching the gold</div>
-          <div className="loader-substep">{loaderMsg}</div>
-        </div>
-        {imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            className={`ring-image${imageLoaded ? ' loaded' : ''}`}
-            src={imageUrl}
-            alt="Your signet crest"
-            crossOrigin="anonymous"
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
+        {!hasStarted ? (
+          <div className="ring-loader">
+            <div style={{ marginBottom: '18px', fontSize: '32px', color: 'var(--gold)' }}>✦</div>
+            <div className="loader-title">Your crest awaits.</div>
+            <div className="loader-sub" style={{ marginBottom: '24px' }}>Ready to be forged</div>
+            <button className="btn" onClick={handleForge}>
+              Forge my crest
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className={`ring-loader${!isGenerating && imageLoaded ? ' done' : ''}`}>
+              <div className="loader-ornament" />
+              <div className="loader-title">Forging your signet…</div>
+              <div className="loader-sub">Etching the gold</div>
+              <div className="loader-substep">{loaderMsg}</div>
+            </div>
+            {imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                className={`ring-image${imageLoaded ? ' loaded' : ''}`}
+                src={imageUrl}
+                alt="Your signet crest"
+                crossOrigin="anonymous"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            )}
+          </>
         )}
       </div>
 

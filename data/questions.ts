@@ -210,4 +210,17 @@ export const QUESTIONS: Question[] = [
     type: 'text',
     placeholder: 'Optional — or let the Oracle choose',
   },
+  {
+    key: 'includeInitial',
+    chapter: 'IV',
+    chapterTitle: 'The Road Ahead',
+    prompt: 'Would you like your initial engraved on the crest?',
+    helper: 'A single letter beneath the central symbol — a classic signet tradition.',
+    type: 'options',
+    cols: 2,
+    options: [
+      { value: 'yes', label: 'Yes, engrave my initial' },
+      { value: 'no', label: 'No initial — keep it clean' },
+    ],
+  },
 ];
