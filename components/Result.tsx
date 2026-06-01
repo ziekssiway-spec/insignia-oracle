@@ -50,6 +50,13 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
   const [imageError, setImageError] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+
+  // Clear any cached image on mount so every session starts fresh
+  useEffect(() => {
+    setImageUrl(null);
+    setImageLoaded(false);
+    setHasStarted(false);
+  }, []);
   const [loaderMsg, setLoaderMsg] = useState(LOADER_MESSAGES[0]);
   const [promptOpen, setPromptOpen] = useState(false);
   const [currentPrompt, setCurrentPrompt] = useState('');
