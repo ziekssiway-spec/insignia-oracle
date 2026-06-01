@@ -1,12 +1,12 @@
-// Source: https://kimdunham.com/pages/symbol-dictionary
-// Each symbol has a meaning used both in the questionnaire options and in the image prompt.
+// Universal symbols drawn from heraldic, ancient, and cross-cultural traditions.
+// Meanings written for the Insignia Oracle.
 
 export interface Symbol {
   value: string;
   label: string;
   emoji: string;
   meaning: string;
-  promptDescription: string; // used in the image generation prompt
+  promptDescription: string;
 }
 
 export const SYMBOLS: Symbol[] = [
@@ -14,71 +14,71 @@ export const SYMBOLS: Symbol[] = [
     value: 'nautilus',
     label: 'Nautilus Shell',
     emoji: '🐚',
-    meaning: 'Natural perfection & growth',
-    promptDescription: 'an engraved nautilus shell (symbolizing natural perfection and the golden ratio)',
+    meaning: 'Unfolding & becoming',
+    promptDescription: 'an engraved nautilus shell (symbolizing sacred unfolding and the spiral of growth)',
   },
   {
     value: 'honeycomb',
     label: 'Honeycomb',
     emoji: '⬡',
-    meaning: 'Geometric perfection & harmony',
-    promptDescription: 'an engraved honeycomb pattern (symbolizing geometric perfection and harmony)',
+    meaning: 'Order & community',
+    promptDescription: 'an engraved honeycomb (symbolizing the beauty of structure, patience, and collective purpose)',
   },
   {
     value: 'star',
     label: 'Star',
     emoji: '✦',
-    meaning: 'Dreams & guidance',
-    promptDescription: 'an engraved six-pointed star (symbolizing distant dreams and guidance)',
+    meaning: 'Guidance & longing',
+    promptDescription: 'an engraved six-pointed star (symbolizing inner light and the pull toward what matters)',
   },
   {
     value: 'greek-key',
     label: 'Greek Key',
     emoji: '⌘',
-    meaning: 'Continuity & unity',
-    promptDescription: 'an engraved Greek key meander border (symbolizing timeless continuity and unity)',
+    meaning: 'Continuity & legacy',
+    promptDescription: 'an engraved Greek key meander (symbolizing the unbroken thread of lineage and time)',
   },
   {
     value: 'flame',
     label: 'Flame',
     emoji: '🔥',
-    meaning: 'Passion & illumination',
-    promptDescription: 'an engraved flame (symbolizing fierce elemental energy and illumination)',
+    meaning: 'Passion & courage',
+    promptDescription: 'an engraved flame (symbolizing the fire that drives and transforms)',
   },
   {
     value: 'labyrinth',
     label: 'Labyrinth',
     emoji: '◎',
-    meaning: 'Intricacy & pattern',
-    promptDescription: 'an engraved labyrinth spiral (symbolizing geometric harmony and inner journey)',
+    meaning: 'The inner journey',
+    promptDescription: 'an engraved labyrinth spiral (symbolizing the winding path inward toward truth)',
   },
   {
     value: 'palm',
     label: 'Palm',
     emoji: '🌴',
-    meaning: 'Victory & triumph',
-    promptDescription: 'an engraved palm frond (symbolizing victory, peace, and resilience)',
+    meaning: 'Victory & endurance',
+    promptDescription: 'an engraved palm frond (symbolizing triumph earned through perseverance)',
   },
   {
     value: 'quatrefoil',
     label: 'Quatrefoil',
     emoji: '✿',
-    meaning: 'Symmetry & spirituality',
-    promptDescription: 'an engraved quatrefoil (symbolizing spiritual balance and sacred symmetry)',
+    meaning: 'Balance & grace',
+    promptDescription: 'an engraved quatrefoil (symbolizing harmony, wholeness, and quiet spiritual power)',
   },
   {
     value: 'sun',
     label: 'Sun',
     emoji: '☀',
-    meaning: 'Vitality & renewal',
-    promptDescription: 'an engraved radiant sun (symbolizing life-giving energy and renewal)',
+    meaning: 'Radiance & life force',
+    promptDescription: 'an engraved radiant sun (symbolizing vitality, clarity, and the power to illuminate)',
   },
   {
     value: 'pyramid',
     label: 'Pyramid',
     emoji: '△',
-    meaning: 'Ancient wisdom & ambition',
-    promptDescription: 'an engraved pyramid (symbolizing ancient wisdom and human ambition)',
+    meaning: 'Mastery & permanence',
+    promptDescription: 'an engraved pyramid (symbolizing the pursuit of greatness and what endures)',
   },
 ];
 
