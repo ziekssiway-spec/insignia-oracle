@@ -211,9 +211,18 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
   const resultName = answers.firstname ? `${titleCase(answers.firstname)}'s Insignia` : 'Your Insignia';
 
   return (
-    <div className="stage result-stage">
+    <div className="stage result-stage" style={isGenerating && !imageLoaded && hasStarted ? {
+      position: 'fixed', inset: 0, zIndex: 999, maxWidth: '100%',
+      background: 'radial-gradient(ellipse at center, #0a0818 0%, #03020a 70%, #010108 100%)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'center', overflow: 'hidden',
+    } : {}}>
       {/* Ring image */}
-      <div className="ring-frame" style={{ background: !hasStarted || (isGenerating && !imageLoaded) ? '#0a0500' : undefined }}>
+      <div className="ring-frame" style={
+        isGenerating && !imageLoaded && hasStarted
+          ? { width: '100vw', maxWidth: '100vw', aspectRatio: 'unset', height: '100vh', borderRadius: 0, boxShadow: 'none', background: 'transparent', margin: 0, position: 'fixed', inset: 0 }
+          : {}
+      }>
         {!hasStarted ? (
           // Pre-forge state
           <div className="ring-loader">
