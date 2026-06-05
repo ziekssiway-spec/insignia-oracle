@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 
-// Allow up to 60 seconds for image generation (gpt-image-1 takes 20-40s)
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  // ── Rate limiting: max 2 images per IP per 24 hours ───────────────────────
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
     req.headers.get('x-real-ip') ||
@@ -17,7 +15,7 @@ export async function POST(req: NextRequest) {
     const resetsIn = Math.ceil((limit.resetsAt - Date.now()) / 1000 / 60 / 60);
     return NextResponse.json(
       {
-        error: `RATE_LIMIT`,
+        error: 'RATE_LIMIT',
         message: `You've used both your crest generations. Your forge resets in ${resetsIn} hour${resetsIn === 1 ? '' : 's'}.`,
         resetsAt: limit.resetsAt,
       },
@@ -26,36 +24,46 @@ export async function POST(req: NextRequest) {
   }
 
   const { prompt } = await req.json();
-
   if (!prompt || typeof prompt !== 'string') {
     return NextResponse.json({ error: 'prompt required' }, { status: 400 });
   }
 
-  // ── Paid path: OpenAI DALL-E 3 ───────────────────────────────────────────
   if (process.env.OPENAI_API_KEY) {
     try {
       const { default: OpenAI } = await import('openai');
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-      const response = await openai.images.generate({
-        model: 'gpt-image-1',
-        prompt,
-        n: 1,
-        size: '1024x1024',
-        quality: 'high',
-      });
+      // Try dall-e-3 first (fastest, ~10s). Fall back to gpt-image-1 if unavailable.
+      let imageUrl: string | undefined;
 
-      const data = response.data ?? [];
-      const item = data[0];
-      if (!item) throw new Error('No image returned');
+      try {
+        const response = await openai.images.generate({
+          model: 'dall-e-3',
+          prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'hd',
+        });
+        imageUrl = response.data[0]?.url;
+      } catch (dalle3Err: unknown) {
+        const msg = dalle3Err instanceof Error ? dalle3Err.message : String(dalle3Err);
+        console.warn('[generate-image] dall-e-3 failed, trying gpt-image-1:', msg);
 
-      // gpt-image-1 returns base64, dall-e-3 returns a URL
-      const b64 = (item as { b64_json?: string }).b64_json;
-      const imageUrl = item.url
-        ? item.url
-        : `data:image/png;base64,${b64}`;
+        const response = await openai.images.generate({
+          model: 'gpt-image-1',
+          prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'high',
+        });
+        const item = response.data?.[0];
+        const b64 = (item as { b64_json?: string })?.b64_json;
+        imageUrl = item?.url ?? (b64 ? `data:image/png;base64,${b64}` : undefined);
+      }
 
+      if (!imageUrl) throw new Error('No image returned');
       return NextResponse.json({ imageUrl });
+
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[generate-image] OpenAI error:', msg);
@@ -63,15 +71,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Free fallback: Pollinations (no key set) ──────────────────────────────
+  // Free fallback: Pollinations
   const seed = Math.floor(Math.random() * 1_000_000);
   const params = new URLSearchParams({
-    width: '1024',
-    height: '1024',
-    model: 'flux',
-    nologo: 'true',
-    seed: String(seed),
-    private: 'true',
+    width: '1024', height: '1024',
+    model: 'flux', nologo: 'true',
+    seed: String(seed), private: 'true',
   });
   const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?${params}`;
   return NextResponse.json({ imageUrl });
