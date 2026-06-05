@@ -103,27 +103,32 @@ export default function ForgeAnimation({ firstName }: Props) {
 
       ctx.clearRect(0, 0, w, h);
 
-      // Dark forge background
-      const bg = ctx.createRadialGradient(x0, y0 * 1.3, 0, x0, y0, Math.max(w, h) * 0.8);
-      bg.addColorStop(0, '#1a0a00');
-      bg.addColorStop(0.4, '#0d0500');
-      bg.addColorStop(1, '#050200');
+      // Deep galaxy background
+      const bg = ctx.createRadialGradient(x0, y0 * 0.8, 0, x0, y0, Math.max(w, h) * 0.9);
+      bg.addColorStop(0, '#0a0818');
+      bg.addColorStop(0.4, '#05040f');
+      bg.addColorStop(1, '#020208');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, w, h);
 
-      // Forge fire glow from below
-      const fireGlow = ctx.createRadialGradient(x0, h * 0.85, 0, x0, h * 0.7, w * 0.6);
-      fireGlow.addColorStop(0, `rgba(200,80,20,${0.12 + Math.sin(tick * 0.05) * 0.05})`);
-      fireGlow.addColorStop(0.5, `rgba(150,40,5,${0.06 + Math.sin(tick * 0.04) * 0.03})`);
-      fireGlow.addColorStop(1, 'transparent');
-      ctx.fillStyle = fireGlow;
+      // Nebula glow — purple/blue
+      const nebulaGlow = ctx.createRadialGradient(x0 * 0.6, y0 * 0.5, 0, x0 * 0.6, y0 * 0.5, w * 0.5);
+      nebulaGlow.addColorStop(0, `rgba(80,40,160,${0.08 + Math.sin(tick * 0.012) * 0.04})`);
+      nebulaGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = nebulaGlow;
       ctx.fillRect(0, 0, w, h);
 
-      // Central golden forge glow — breathing
+      const nebulaGlow2 = ctx.createRadialGradient(x0 * 1.4, y0 * 1.3, 0, x0 * 1.4, y0 * 1.3, w * 0.4);
+      nebulaGlow2.addColorStop(0, `rgba(20,80,160,${0.07 + Math.sin(tick * 0.009 + 1) * 0.03})`);
+      nebulaGlow2.addColorStop(1, 'transparent');
+      ctx.fillStyle = nebulaGlow2;
+      ctx.fillRect(0, 0, w, h);
+
+      // Central gold pulse — the crest being forged
       const breathe = 0.5 + 0.5 * Math.sin(tick * 0.025);
       const goldGlow = ctx.createRadialGradient(x0, y0, 0, x0, y0, 120 + breathe * 30);
-      goldGlow.addColorStop(0, `rgba(255,180,40,${0.18 + breathe * 0.12})`);
-      goldGlow.addColorStop(0.3, `rgba(200,120,20,${0.1 + breathe * 0.06})`);
+      goldGlow.addColorStop(0, `rgba(220,180,60,${0.2 + breathe * 0.12})`);
+      goldGlow.addColorStop(0.3, `rgba(160,100,200,${0.06 + breathe * 0.04})`);
       goldGlow.addColorStop(1, 'transparent');
       ctx.fillStyle = goldGlow;
       ctx.fillRect(0, 0, w, h);
@@ -135,7 +140,7 @@ export default function ForgeAnimation({ firstName }: Props) {
       // Outer decorative ring
       ctx.beginPath();
       ctx.arc(x0, y0, ringRadius + 12, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(180,130,30,${0.12 + breathe * 0.08})`;
+      ctx.strokeStyle = `rgba(120,80,220,${0.15 + breathe * 0.08})`;
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -224,15 +229,15 @@ export default function ForgeAnimation({ firstName }: Props) {
         ctx.beginPath();
         ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
         ctx.fillStyle = e.gold
-          ? `rgba(255,190,50,${alpha})`
-          : `rgba(255,120,30,${alpha * 0.7})`;
+          ? `rgba(220,190,80,${alpha})`
+          : `rgba(140,100,255,${alpha * 0.8})`;
         ctx.fill();
         // Tiny trail
         ctx.beginPath();
         ctx.arc(e.x - e.vx * 2, e.y - e.vy * 2, e.r * 0.5, 0, Math.PI * 2);
         ctx.fillStyle = e.gold
-          ? `rgba(255,220,100,${alpha * 0.3})`
-          : `rgba(255,100,20,${alpha * 0.2})`;
+          ? `rgba(255,230,120,${alpha * 0.3})`
+          : `rgba(180,140,255,${alpha * 0.2})`;
         ctx.fill();
       }
 

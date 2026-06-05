@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 
+// Allow up to 60 seconds for image generation (gpt-image-1 takes 20-40s)
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   // ── Rate limiting: max 2 images per IP per 24 hours ───────────────────────
   const ip =
