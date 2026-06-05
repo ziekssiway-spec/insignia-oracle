@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           size: '1024x1024',
           quality: 'hd',
         });
-        imageUrl = response.data[0]?.url;
+        imageUrl = response.data?.[0]?.url;
       } catch (dalle3Err: unknown) {
         const msg = dalle3Err instanceof Error ? dalle3Err.message : String(dalle3Err);
         console.warn('[generate-image] dall-e-3 failed, trying gpt-image-1:', msg);
