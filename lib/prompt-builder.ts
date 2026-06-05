@@ -18,8 +18,22 @@ function familyInitial(answers: Answers): string {
   return f ? f.charAt(0).toUpperCase() : '';
 }
 
-export function buildPrompt(answers: Answers): string {
-  const animal = firstClause(answers.animal) || 'a single emblematic creature';
+const DEFAULT_ANIMALS = [
+  'a raven with wings spread',
+  'a serpent coiled gracefully',
+  'an owl in profile',
+  'a wolf in heraldic stance',
+  'a phoenix rising',
+  'a deer with antlers',
+  'a bear rearing up',
+  'a heron standing tall',
+  'a fox in profile',
+  'a horse rearing',
+];
+
+export function buildPrompt(answers: Answers, seed?: number): string {
+  const defaultAnimal = DEFAULT_ANIMALS[(seed ?? Math.floor(Math.random() * DEFAULT_ANIMALS.length)) % DEFAULT_ANIMALS.length];
+  const animal = firstClause(answers.animal) || defaultAnimal;
   const symbolEntry = answers.symbol ? getSymbolByValue(answers.symbol) : undefined;
   const symbolPart = symbolEntry
     ? `, with ${symbolEntry.promptDescription}`
