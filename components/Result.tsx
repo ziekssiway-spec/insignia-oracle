@@ -120,7 +120,15 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
         return;
       }
       if (!res.ok || data.error) throw new Error(data.error || 'Generation failed');
-      setImageUrl(data.imageUrl!);
+      if (!data.imageUrl) throw new Error('No image returned');
+
+      // Stop the animation immediately — don't wait for onLoad (base64 data URIs
+      // can silently skip onLoad in some browsers when the img is hidden).
+      if (loaderTimer.current) clearInterval(loaderTimer.current);
+      setImageUrl(data.imageUrl);
+      setIsGenerating(false);
+      setImageLoaded(true);
+      setRegenDisabled(false);
     } catch (err: unknown) {
       if (loaderTimer.current) clearInterval(loaderTimer.current);
       const msg = err instanceof Error ? err.message : String(err);
@@ -234,7 +242,6 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
             </button>
           </div>
         ) : isGenerating && !imageLoaded ? (
-          // Magical forge animation
           <ForgeAnimation firstName={answers.firstname} />
         ) : (
           // Image reveal
