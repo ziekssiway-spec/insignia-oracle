@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Answers } from '@/lib/types';
 import type { Quote } from '@/data/quotes';
 import { ARCH_LABEL } from '@/data/quotes';
+import ForgeAnimation from '@/components/ForgeAnimation';
 
 interface ResultProps {
   answers: Answers;
@@ -212,19 +213,24 @@ export default function Result({ answers, email, quote, onRestart }: ResultProps
   return (
     <div className="stage result-stage">
       {/* Ring image */}
-      <div className="ring-frame">
+      <div className="ring-frame" style={{ background: !hasStarted || (isGenerating && !imageLoaded) ? '#0a0500' : undefined }}>
         {!hasStarted ? (
+          // Pre-forge state
           <div className="ring-loader">
-            <div style={{ marginBottom: '18px', fontSize: '32px', color: 'var(--gold)' }}>✦</div>
+            <div style={{ marginBottom: '18px', fontSize: '32px', color: 'var(--gold)', animation: 'spin 8s linear infinite' }}>✦</div>
             <div className="loader-title">Your crest awaits.</div>
             <div className="loader-sub" style={{ marginBottom: '24px' }}>Ready to be forged</div>
             <button className="btn" onClick={handleForge}>
               Forge my crest
             </button>
           </div>
+        ) : isGenerating && !imageLoaded ? (
+          // Magical forge animation
+          <ForgeAnimation firstName={answers.firstname} />
         ) : (
+          // Image reveal
           <>
-            <div className={`ring-loader${!isGenerating && imageLoaded ? ' done' : ''}`}>
+            <div className={`ring-loader${imageLoaded ? ' done' : ''}`}>
               <div className="loader-ornament" />
               <div className="loader-title">Forging your signet…</div>
               <div className="loader-sub">Etching the gold</div>
