@@ -12,6 +12,8 @@
   --night: #0B0818;
   --veil: rgba(28, 22, 52, 0.55);
   --hairline: rgba(212, 175, 55, 0.28);
+  --flicker: 1;
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -133,7 +135,7 @@ p.lede { font-size: 18px; }
   background: linear-gradient(90deg, var(--gold), transparent);
 }
 
-.ornament svg { width: 22px; height: 22px; filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.5)); }
+.ornament svg { width: 22px; height: 22px; filter: drop-shadow(0 0 calc(7px * var(--flicker, 1)) rgba(212, 175, 55, 0.55)); }
 
 .welcome-card .kicker {
   font-size: 12px;
@@ -158,6 +160,7 @@ p.lede { font-size: 18px; }
 
 /* BUTTON */
 .btn {
+  position: relative; /* anchor the singing-bowl ripple to the button */
   display: inline-block;
   padding: 15px 38px;
   background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
@@ -170,13 +173,15 @@ p.lede { font-size: 18px; }
   text-transform: uppercase;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.25);
+  /* transform is included here so the magnetic lean eases via CSS and the JS
+     never has to clobber this transition list */
+  transition: box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease,
+              transform 0.4s var(--ease-settle);
+  box-shadow: 0 4px calc(18px * var(--flicker, 1)) rgba(212, 175, 55, 0.25);
 }
 
 .btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 26px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 6px calc(30px * var(--flicker, 1)) rgba(212, 175, 55, 0.45);
 }
 
 .btn.ghost {
@@ -230,7 +235,7 @@ p.lede { font-size: 18px; }
   height: 100%;
   background: linear-gradient(90deg, var(--gold), var(--gold-bright));
   transition: width 0.4s ease;
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 calc(9px * var(--flicker, 1)) rgba(212, 175, 55, 0.6);
 }
 
 /* QUESTION CARD */
@@ -405,7 +410,8 @@ textarea.q-input {
   font-size: 40px;
   color: var(--gold);
   margin-bottom: 18px;
-  text-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+  text-shadow: 0 0 calc(20px * var(--flicker, 1)) rgba(212, 175, 55, 0.5);
+  animation: orbBreathe 6s ease-in-out infinite;
 }
 
 .gate-card h2 { font-size: 34px; }
@@ -600,6 +606,7 @@ textarea.q-input {
 }
 
 .tool-btn {
+  position: relative; /* anchor the ripple to the button */
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(212, 175, 55, 0.35);
   color: var(--cream);
@@ -799,6 +806,109 @@ textarea.q-input {
   color: var(--gold-deep);
   font-style: italic;
   line-height: 1.2;
+}
+
+/* ============================================================
+   LIVING ATMOSPHERE — ember dust, cursor candle-glow, tilt, ripples
+   ============================================================ */
+.oracle-dust {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.oracle-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 600px;
+  height: 600px;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.035) 42%, transparent 66%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  will-change: transform, opacity;
+}
+
+/* singing-bowl ripple struck on every meaningful press */
+.oracle-ripple {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-bright);
+  pointer-events: none;
+  z-index: 4;
+  animation: oracleRipple 0.9s ease-out forwards;
+}
+@keyframes oracleRipple {
+  to { transform: scale(22); opacity: 0; }
+}
+
+/* 3D tilt + candlelight sheen on the option & symbol cards */
+.option,
+.symbol-card {
+  position: relative;
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease,
+              transform 0.6s var(--ease-settle);
+  will-change: transform;
+}
+.option[data-tilting='true'],
+.symbol-card[data-tilting='true'] {
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease,
+              transform 0.1s ease-out;
+}
+.option::after,
+.symbol-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(60% 60% at var(--mx, 50%) var(--my, 50%), rgba(212, 175, 55, 0.2), transparent 72%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.35s ease;
+}
+.option:hover::after,
+.symbol-card:hover::after { opacity: 1; }
+/* keep card content above the sheen */
+.option > *,
+.symbol-card > * { position: relative; z-index: 2; }
+
+/* selection ceremony — a brief bloom when a card is chosen */
+.option.selected,
+.symbol-card.selected { animation: selectBloom 0.55s var(--ease-settle); }
+@keyframes selectBloom {
+  40% { box-shadow: inset 0 0 0 1px var(--gold-bright), 0 0 26px rgba(212, 175, 55, 0.5); }
+}
+
+/* the ornament star breathes */
+.ornament svg { animation: orbBreathe 6s ease-in-out infinite; }
+@keyframes orbBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oracle-dust, .oracle-glow { display: none; }
+  .option, .symbol-card { transform: none !important; }
+  .option::after, .symbol-card::after { display: none; }
+  .oracle-ripple { display: none; }
+  .ornament svg,
+  .gate-card .seal,
+  .option.selected, .symbol-card.selected { animation: none; }
+}
+@media (hover: none), (pointer: coarse) {
+  .option, .symbol-card { transform: none; will-change: auto; }
 }
 
 /* RESPONSIVE */
